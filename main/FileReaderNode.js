@@ -6,6 +6,8 @@ const archiver = require('archiver');
 const http = require('http');
 const request = require('request');
 const Papa = require('papaparse');
+
+
 let phoneNumberDict = {
     // # Viettel
     '0169': '039',
@@ -131,7 +133,7 @@ function normalizeGender(gender) {
 
 async function handleFile(parsedData) {
     let colNameIndex = {
-        name: { keywords: ["name", "khach hang", "tên", "họ tên", "họ và tên", "họ & tên", "họ & tên khách hàng"] },
+        name: { keywords: ["name", "khach hang", "tên", "họ tên", "họ và tên", "họ & tên", "họ & tên khách hàng", "hội viên"] },
         gender: { keywords: ["gender", "gioi tinh", "giới tính", "phái", "giới"] },
         phone: { keywords: ["phone", "liên hệ", "dt", "dien thoai", "so dien thoai", "sđt", "sdt", "số đt", "phone number", "số điện thoại", "điện thoại", "di động"] },
         birthday: { keywords: ["birthday", "ngày sinh", "sinh nhật"] },
@@ -200,8 +202,7 @@ async function handleFile(parsedData) {
         return result;
     }
 }
-async function importData(file) {
-    let filePath = file.path;
+async function importData(filePath) {
     let results = [];
     let fileType = filePath.split(".").pop();
     if (fileType === 'xls' || fileType === 'xlsx') {
@@ -215,7 +216,7 @@ async function importData(file) {
         }
     } else if (fileType === 'csv') {
         return new Promise((resolve, reject) => {
-            fs.readFile('/Users/nguyenhoanganh/Downloads/Data/test.csv', 'utf8', async (err, data) => {
+            fs.readFile(filePath, 'utf8', async (err, data) => {
                 if (err) {
                     console.error(err);
                     return;
@@ -229,8 +230,6 @@ async function importData(file) {
     }
     return results.flat();
 }
-
-
 async function openFiles() {
     return new Promise((resolve, reject) => {
         const input = document.createElement('input');
@@ -305,7 +304,6 @@ function sendFile(fileName) {
         console.log("khong thay token");
     }
 }
-
 async function openFolder() {
     return new Promise((resolve, reject) => {
         const folderInput = document.createElement("input");
