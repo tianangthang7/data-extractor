@@ -18,10 +18,10 @@ function createWindow() {
     }
   });
   win.loadFile("dist/index.html");
-  win.loadURL("http://localhost:8000/#/");
+  // win.loadURL("http://localhost:8000/#/");
   win.maximize();
   win.show();
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
 
   ipcMain.handle('dialog:openDirectory', async () => {
@@ -67,10 +67,13 @@ function createWindow() {
       return filesFiltred;
     }
   });
-  ipcMain.handle('importData', async (event, filePath, destination, mode) => {
-    console.log('importData', filePath, destination, mode);
+  ipcMain.handle('importData', async (event, filePath) => {
     const data = await fileReaderNode.importData(filePath);
     return data;
+  });
+
+  ipcMain.handle('writeData', async (event, data, filePath) => {
+    await fileReaderNode.writeData(data, filePath);
   });
 }
 

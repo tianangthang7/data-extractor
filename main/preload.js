@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('myAPI', {
     selectFolder: () => ipcRenderer.invoke('dialog:openDirectory'),
     openFiles: () => ipcRenderer.invoke('dialog:openFiles'),
     openFolder: () => ipcRenderer.invoke('dialog:openFolder'),
-    importData: (filePath, destination, mode) => ipcRenderer.invoke('importData', filePath, destination, mode)
+    importData: (filePath) => ipcRenderer.invoke('importData', filePath),
+    writeData: (data, filePath) => ipcRenderer.invoke('writeData', data, filePath)
 })

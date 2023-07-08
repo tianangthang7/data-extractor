@@ -77,14 +77,14 @@ function normalizePhoneNumber(phoneNumber) {
 
     // Nếu có dấu cộng ở đầu, chuyển thành số 0
     if (normalized.startsWith('+84')) {
-        normalized = '0' + normalized.slice(3);
+        normalized = '0' + normalized.slice(4);
     }
 
 
     // Nếu đầu số có 11 số, bỏ số 0 đầu tiên
     if (normalized.length === 11 && normalized.startsWith('0')) {
         try {
-            normalized = phoneNumberDict[normalized.slice(0, 4)] + normalized.slice(3);
+            normalized = phoneNumberDict[normalized.slice(0, 4)] + normalized.slice(4);
         } catch (error) {
             console.error("Cannot normal phonenumber ", normalized);
             return;
@@ -116,19 +116,6 @@ function findHeader(data, colNameIndex) {
         }
     }
     return -1;
-}
-function normalizeGender(gender) {
-    let anh = ["ông", "nam", "anh", "mr", "male", "m"];
-    let chi = ["bà", "nữ", "chị", "mrs", "female", "f"];
-    gender = gender.normalize();
-    if (anh.includes(gender.toLowerCase())) {
-        return "anh";
-    } else if (chi.includes(gender.toLowerCase())) {
-        return "chị";
-    } else {
-        console.log(gender);
-        return "anh/chị";
-    }
 }
 
 async function handleFile(parsedData) {
@@ -186,12 +173,12 @@ async function handleFile(parsedData) {
                             continue;
                         }
                     }
-                    else if (col == "gender") {
-                        contact[col] = normalizeGender(row[index]);
-                    }
-                    else {
-                        contact[col] = row[index];
-                    }
+                    // else if (col == "gender") {
+                    //     contact[col] = normalizeGender(row[index]);
+                    // }
+                    // else {
+                    //     contact[col] = row[index];
+                    // }
                 }
             }
             if (Object.keys(contact).includes("phone") && contact.phone) {
@@ -200,6 +187,22 @@ async function handleFile(parsedData) {
         }
         console.log(result);
         return result;
+    }
+}
+
+async function writeData(data, filePath) {
+    if (filePath.includes("txt")) {
+        fs.writeFile(`${filePath}`, data.join('\n'), (err) => {
+            if (err) throw err;
+            console.log('Data written to file');
+        });
+
+    } else {
+        fs.writeFile(`${filePath}.txt`, data.join('\n'), (err) => {
+            if (err) throw err;
+            console.log('Data written to file');
+        });
+
     }
 }
 async function importData(filePath) {
@@ -328,4 +331,4 @@ async function openFolder() {
 }
 
 
-module.exports = { importData, zipFiles, openFiles, openFolder }
+module.exports = { importData, zipFiles, openFiles, openFolder, writeData }

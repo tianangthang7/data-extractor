@@ -10,7 +10,14 @@ const numfilesProcessed = ref(0);
 const destination = ref("D:\\");
 const mode = ref("muiltipleFiles");
 const files = ref([]);
+const slashes = ref("\\");
 
+onBeforeMount(() => {
+	if (navigator.platform.includes("Mac")) {
+		destination.value = "/Users/nguyenhoanganh/Documents";
+		slashes.value = "/";
+	}
+});
 const start = async () => {
 	if (files.value.length == 0) {
 		toast.add({
@@ -34,21 +41,47 @@ const start = async () => {
 	}
 
 	console.log(files.value);
+	let allData = [];
 	for (let i = 0; i < files.value.length; i++) {
 		numfilesProcessed.value = i + 1;
-		let data = await window.myAPI.importData(
-			files.value[i],
-			destination.value,
-			mode.value
-		);
+		let data = await window.myAPI.importData(files.value[i]);
+		const data2 = [];
+		for (let num of data) {
+			data2.push(num.phone);
+		}
+		if (mode.value == "muiltipleFiles") {
+			const fileName = files.value[i].replace(/^.*[\\\/]/, "");
+			console.log(fileName);
+			await window.myAPI.writeData(data2, `${destination.value}/${fileName}`);
+		} else {
+			allData.push(data);
+		}
+	}
+
+	if (mode.value != "muiltipleFiles") {
+		allData = allData.flat();
+		let numlist = [];
+		for (let num of allData) {
+			numlist.push(num.phone);
+		}
+		const uniq = [...new Set(numlist)];
+		await window.myAPI.writeData(uniq, destination.value);
 	}
 };
 
 watch(mode, (newMode) => {
 	if (newMode == "singleFile") {
-		destination.value += "\\output.txt";
+		if (navigator.platform.includes("Mac")) {
+			destination.value += "/output.txt";
+		} else {
+			destination.value += "\\output.txt";
+		}
 	} else {
-		destination.value = destination.value.replaceAll("\\output.txt", "");
+		if (navigator.platform.includes("Mac")) {
+			destination.value = destination.value.replaceAll("/output.txt", "");
+		} else {
+			destination.value = destination.value.replaceAll("\\output.txt", "");
+		}
 	}
 });
 const openFiles = async () => {
